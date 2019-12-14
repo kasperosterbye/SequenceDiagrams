@@ -1,19 +1,19 @@
 Class {
-	#name : #MessageLogger,
+	#name : #SeqMessageLogger,
 	#superclass : #Object,
 	#instVars : [
 		'log'
 	],
-	#category : #SequenceDiagrams
+	#category : #'SequenceDiagrams-Tally'
 }
 
 { #category : #visiting }
-MessageLogger >> accept: aVisitor [
+SeqMessageLogger >> accept: aVisitor [
 	^ log accept: aVisitor
 ]
 
 { #category : #'as yet unclassified' }
-MessageLogger >> logBlock: aBlock [
+SeqMessageLogger >> logBlock: aBlock [
 	| prev |
 	prev := aBlock.
 	thisContext sender
@@ -27,9 +27,9 @@ MessageLogger >> logBlock: aBlock [
 ]
 
 { #category : #'as yet unclassified' }
-MessageLogger >> logCall: aContext [
+SeqMessageLogger >> logCall: aContext [
 	| entry |
-	entry := MessageLoggerEntry new
+	entry := SeqMessageLoggerEntry new
 		sender: aContext sender receiver;
 		receiver: aContext receiver;
 		selector: aContext methodSelector;
@@ -40,9 +40,9 @@ MessageLogger >> logCall: aContext [
 ]
 
 { #category : #'as yet unclassified' }
-MessageLogger >> logReturn: aContext [
+SeqMessageLogger >> logReturn: aContext [
 | entry |
-	entry := MessageLoggerEntry new
+	entry := SeqMessageLoggerEntry new
 		sender: aContext sender receiver;
 		receiver: aContext receiver;
 		selector: #'^';

@@ -1,5 +1,5 @@
 Class {
-	#name : #MessageLoggerEntry,
+	#name : #SeqMessageLoggerEntry,
 	#superclass : #Object,
 	#instVars : [
 		'sender',
@@ -9,52 +9,52 @@ Class {
 		'children',
 		'parent'
 	],
-	#category : #SequenceDiagrams
+	#category : #'SequenceDiagrams-Tally'
 }
 
 { #category : #visiting }
-MessageLoggerEntry >> accept: aVisitor [
+SeqMessageLoggerEntry >> accept: aVisitor [
 	^ aVisitor visit: self
 ]
 
 { #category : #adding }
-MessageLoggerEntry >> addChild: childEntry [
+SeqMessageLoggerEntry >> addChild: childEntry [
 	children add: childEntry.
 	childEntry parent: self.
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> arguments [
+SeqMessageLoggerEntry >> arguments [
 	^ arguments
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> arguments: anObject [
+SeqMessageLoggerEntry >> arguments: anObject [
 	arguments := anObject
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> children [
+SeqMessageLoggerEntry >> children [
 	^ children
 ]
 
 { #category : #initialization }
-MessageLoggerEntry >> initialize [ 
+SeqMessageLoggerEntry >> initialize [ 
 	children := OrderedCollection new.
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> parent [
+SeqMessageLoggerEntry >> parent [
 	^ parent
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> parent: anObject [
+SeqMessageLoggerEntry >> parent: anObject [
 	parent := anObject
 ]
 
 { #category : #printing }
-MessageLoggerEntry >> printOn: aStream [
+SeqMessageLoggerEntry >> printOn: aStream [
 	aStream 
 		<< sender class name; 
 		<< ' «';
@@ -72,31 +72,31 @@ MessageLoggerEntry >> printOn: aStream [
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> receiver [
+SeqMessageLoggerEntry >> receiver [
 	^ receiver
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> receiver: anObject [
+SeqMessageLoggerEntry >> receiver: anObject [
 	receiver := anObject
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> selector [
+SeqMessageLoggerEntry >> selector [
 	^ selector
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> selector: anObject [
+SeqMessageLoggerEntry >> selector: anObject [
 	selector := anObject
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> sender [
+SeqMessageLoggerEntry >> sender [
 	^ sender
 ]
 
 { #category : #accessing }
-MessageLoggerEntry >> sender: anObject [
+SeqMessageLoggerEntry >> sender: anObject [
 	sender := anObject
 ]

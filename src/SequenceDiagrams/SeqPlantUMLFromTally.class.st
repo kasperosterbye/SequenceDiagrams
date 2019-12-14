@@ -4,18 +4,18 @@ I am a class which produce a plant uml source code based on the tally from a blo
 See example on class side
 "
 Class {
-	#name : #PlantUMLFromTally,
+	#name : #SeqPlantUMLFromTally,
 	#superclass : #Object,
 	#instVars : [
 		'packageFilter',
 		'savedSenders',
 		'skipSelectors'
 	],
-	#category : #SequenceDiagrams
+	#category : #'SequenceDiagrams-Tally'
 }
 
 { #category : #examples }
-PlantUMLFromTally class >> example1 [
+SeqPlantUMLFromTally class >> example1 [
 	<example>
 	self openForm: (self 
 		seqDiagramFor: [ Float pi printString] 
@@ -24,13 +24,13 @@ PlantUMLFromTally class >> example1 [
 ]
 
 { #category : #examples }
-PlantUMLFromTally class >> example2 [
+SeqPlantUMLFromTally class >> example2 [
 	<example>
 	self openForm: (self seqDiagramFor: [ 4 factorial ]).
 ]
 
 { #category : #'as yet unclassified' }
-PlantUMLFromTally class >> openForm: form [
+SeqPlantUMLFromTally class >> openForm: form [
 	| window scrollPane |
 	window := SystemWindow labelled: 'Sequence Diagram'.
 	scrollPane := ScrollPane new.
@@ -40,36 +40,36 @@ PlantUMLFromTally class >> openForm: form [
 ]
 
 { #category : #'as yet unclassified' }
-PlantUMLFromTally class >> seqDiagramFor: aBlock [ 
+SeqPlantUMLFromTally class >> seqDiagramFor: aBlock [ 
 	^ self seqDiagramFor: aBlock in: { '' }.
 ]
 
 { #category : #'as yet unclassified' }
-PlantUMLFromTally class >> seqDiagramFor: aBlock in: packageList [
+SeqPlantUMLFromTally class >> seqDiagramFor: aBlock in: packageList [
 	^ self seqDiagramFor: aBlock in: packageList  skipSelectors: #()
 ]
 
 { #category : #'as yet unclassified' }
-PlantUMLFromTally class >> seqDiagramFor: aBlock in: packageList skipSelectors: selectors [
+SeqPlantUMLFromTally class >> seqDiagramFor: aBlock in: packageList skipSelectors: selectors [
 	|  ulmSource |
 	ulmSource := self new umlForBlock: aBlock  in: packageList  skipSelectors: selectors .
-	^ PRPlantUMLUrlFromSource loadUML: ulmSource.
+	^ SeqPlantUMLBridge loadUML: ulmSource.
 ]
 
 { #category : #'as yet unclassified' }
-PlantUMLFromTally >> catchAllName [
+SeqPlantUMLFromTally >> catchAllName [
 	^'Something'
 ]
 
 { #category : #initialization }
-PlantUMLFromTally >> initialize [
+SeqPlantUMLFromTally >> initialize [
 	savedSenders := OrderedCollection new.
 	savedSenders addLast: self catchAllName.
 	
 ]
 
 { #category : #'as yet unclassified' }
-PlantUMLFromTally >> normalized: aClass [ 
+SeqPlantUMLFromTally >> normalized: aClass [ 
 	^(packageFilter  anySatisfy: [ :pn | pn isEmpty or: [aClass category beginsWith: pn]])
 		ifTrue: [ aClass name asString copyReplaceAll: ' ' with: '_'] 
 		ifFalse: [ ^ self catchAllName  ]
@@ -77,7 +77,7 @@ PlantUMLFromTally >> normalized: aClass [
 ]
 
 { #category : #'instance creation' }
-PlantUMLFromTally >> tallyFor: aBlock [
+SeqPlantUMLFromTally >> tallyFor: aBlock [
 	^ (MessageTally 
 			tallySendsTo: nil 
 			inBlock: aBlock 
@@ -88,7 +88,7 @@ PlantUMLFromTally >> tallyFor: aBlock [
 ]
 
 { #category : #'instance creation' }
-PlantUMLFromTally >> umlForBlock: aBlock in: packages [
+SeqPlantUMLFromTally >> umlForBlock: aBlock in: packages [
 	^ self umlForBlock: aBlock in:  packages skipSelectors: #()
 	
 	
@@ -97,7 +97,7 @@ PlantUMLFromTally >> umlForBlock: aBlock in: packages [
 ]
 
 { #category : #'instance creation' }
-PlantUMLFromTally >> umlForBlock: aBlock in: packages skipSelectors: selectors [
+SeqPlantUMLFromTally >> umlForBlock: aBlock in: packages skipSelectors: selectors [
 	|outStream tally|
 	packageFilter := packages.
 	skipSelectors := selectors, #(tallyFor:).
@@ -119,7 +119,7 @@ ParticipantFontSize 12
 ]
 
 { #category : #accessing }
-PlantUMLFromTally >> visit: aTally [
+SeqPlantUMLFromTally >> visit: aTally [
 	| senderName receivers receiversText|
 	senderName := (self normalized: aTally theClass).
 	receivers := aTally receivers reject: [:tally | skipSelectors includes: tally method selector ].
@@ -137,7 +137,7 @@ PlantUMLFromTally >> visit: aTally [
 ]
 
 { #category : #accessing }
-PlantUMLFromTally >> visit: sender to: aTally [
+SeqPlantUMLFromTally >> visit: sender to: aTally [
 	| senderName receiverName selector out arrow|
 	senderName := self normalized: sender theClass.
 	receiverName :=  self normalized: aTally theClass.

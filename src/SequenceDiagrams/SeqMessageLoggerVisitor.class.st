@@ -1,5 +1,5 @@
 Class {
-	#name : #MessageLoggerVisitor,
+	#name : #SeqMessageLoggerVisitor,
 	#superclass : #Object,
 	#instVars : [
 		'out',
@@ -7,37 +7,37 @@ Class {
 		'presentationFilters',
 		'lastSender'
 	],
-	#category : #SequenceDiagrams
+	#category : #'SequenceDiagrams-Tally'
 }
 
 { #category : #adding }
-MessageLoggerVisitor >> addLogFilter: aFilterBlock [
+SeqMessageLoggerVisitor >> addLogFilter: aFilterBlock [
 	logFilters addLast: aFilterBlock 
 ]
 
 { #category : #adding }
-MessageLoggerVisitor >> addPresentationFilter: aPresentationFilter [
+SeqMessageLoggerVisitor >> addPresentationFilter: aPresentationFilter [
 	presentationFilters addLast: aPresentationFilter 
 ]
 
 { #category : #adding }
-MessageLoggerVisitor >> checkLogFilters: aLogEntry [
+SeqMessageLoggerVisitor >> checkLogFilters: aLogEntry [
 	^logFilters  allSatisfy: [ :pred | pred value: aLogEntry  ] 
 ]
 
 { #category : #adding }
-MessageLoggerVisitor >> checkPresentationFilters: aLogEntry [
+SeqMessageLoggerVisitor >> checkPresentationFilters: aLogEntry [
 	^presentationFilters allSatisfy: [ :pred | pred value: aLogEntry  ] 
 ]
 
 { #category : #'as yet unclassified' }
-MessageLoggerVisitor >> intialize [
+SeqMessageLoggerVisitor >> intialize [
 	out := String new writeStream.
 	logFilters := OrderedCollection new.
 ]
 
 { #category : #visiting }
-MessageLoggerVisitor >> visit: anEntry [
+SeqMessageLoggerVisitor >> visit: anEntry [
 	(self checkPresentationFilters: anEntry)
 		ifTrue: [ self writeUmlCallFor: anEntry ]
 		ifFalse: [ lastSender := anEntry sender ].
@@ -46,7 +46,7 @@ MessageLoggerVisitor >> visit: anEntry [
 ]
 
 { #category : #writing }
-MessageLoggerVisitor >> writeUmlCallFor: anEntry [
+SeqMessageLoggerVisitor >> writeUmlCallFor: anEntry [
 	out 
 		<< anEntry sender class name; 
 		<< ' -> ';
