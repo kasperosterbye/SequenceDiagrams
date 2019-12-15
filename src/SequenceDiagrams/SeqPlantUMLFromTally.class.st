@@ -53,7 +53,7 @@ SeqPlantUMLFromTally class >> seqDiagramFor: aBlock in: packageList [
 SeqPlantUMLFromTally class >> seqDiagramFor: aBlock in: packageList skipSelectors: selectors [
 	|  ulmSource |
 	ulmSource := self new umlForBlock: aBlock  in: packageList  skipSelectors: selectors .
-	^ SeqPlantUMLBridge loadUML: ulmSource.
+	^ PlantUMLBridge loadUML: ulmSource.
 ]
 
 { #category : #'as yet unclassified' }

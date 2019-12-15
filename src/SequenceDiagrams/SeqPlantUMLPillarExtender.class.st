@@ -36,6 +36,6 @@ SeqPlantUMLPillarExtender class >> plantumlStylerFor: source [
 	"I am a codeblock language extender for pillar rendering. "
 	<codeblockStylerFor:'plantuml'>
 	| imageUrl |
-	imageUrl := SeqPlantUMLBridge  urlFromSource: source.
+	imageUrl := PlantUMLBridge  urlFromSource: source.
 	^PRCodeblokStylerExtensions loadExternalImageFromURL: imageUrl errorText: 'PlantUML error'.
 ]
