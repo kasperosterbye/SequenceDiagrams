@@ -1,3 +1,7 @@
+"
+!! Purpose
+I am an entry in a MessageLogger tally. Besides registering a specific method call, my children (who are also instances of ==SeqMessageLoggenEntry==) represents all the calls made in the method I represent.
+"
 Class {
 	#name : #SeqMessageLoggerEntry,
 	#superclass : #Object,

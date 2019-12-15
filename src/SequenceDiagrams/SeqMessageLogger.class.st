@@ -1,3 +1,7 @@
+"
+!! Purpose
+I am a message logger. I work somewhat similar to MessageTally, creating a trace of all messages sendt from executing a block given to me as parameter in ==logBlock:==.
+"
 Class {
 	#name : #SeqMessageLogger,
 	#superclass : #Object,

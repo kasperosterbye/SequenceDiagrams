@@ -1,3 +1,6 @@
+"
+I am a visitor to visit the MessageLogger
+"
 Class {
 	#name : #SeqMessageLoggerVisitor,
 	#superclass : #Object,
