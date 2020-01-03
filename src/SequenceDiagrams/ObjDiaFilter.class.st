@@ -1,5 +1,5 @@
 Class {
-	#name : #SeqClassFilter,
+	#name : #ObjDiaFilter,
 	#superclass : #Object,
 	#instVars : [
 		'includeCategories',
@@ -7,13 +7,17 @@ Class {
 		'includeClasses',
 		'excludeClasses'
 	],
-	#category : #'SequenceDiagrams-Tally'
+	#category : #'SequenceDiagrams-ObjectDiagram'
 }
 
 { #category : #initialization }
-SeqClassFilter >> check: anObject [
+ObjDiaFilter >> check: anObject [
 	| objClass |
+	anObject 
+		ifNil: [ ^ false ].
 	anObject isString
+		ifTrue: [ ^ false ].
+	anObject isClass
 		ifTrue: [ ^ false ].
 	anObject isCollection
 		ifTrue: [ ^ anObject isNotEmpty  ].
@@ -32,32 +36,32 @@ SeqClassFilter >> check: anObject [
 ]
 
 { #category : #'as yet unclassified' }
-SeqClassFilter >> excludeCategory: category [
+ObjDiaFilter >> excludeCategory: category [
 	excludeCategories add: category 
 ]
 
 { #category : #'as yet unclassified' }
-SeqClassFilter >> excludeSubclassesOf: aClass [
+ObjDiaFilter >> excludeSubclassesOf: aClass [
 	excludeClasses add: aClass
 ]
 
 { #category : #accessing }
-SeqClassFilter >> filterBlock [
+ObjDiaFilter >> filterBlock [
 	^[:obj | self check: obj]
 ]
 
 { #category : #'as yet unclassified' }
-SeqClassFilter >> includeCategory: category [
+ObjDiaFilter >> includeCategory: category [
 	includeCategories add: category 
 ]
 
 { #category : #'as yet unclassified' }
-SeqClassFilter >> includeSubclassesOf: aClass [
+ObjDiaFilter >> includeSubclassesOf: aClass [
 	includeClasses add: aClass
 ]
 
 { #category : #initialization }
-SeqClassFilter >> initialize [
+ObjDiaFilter >> initialize [
 	includeCategories := OrderedCollection new.
 	excludeCategories := OrderedCollection new.
 	includeClasses := OrderedCollection new.

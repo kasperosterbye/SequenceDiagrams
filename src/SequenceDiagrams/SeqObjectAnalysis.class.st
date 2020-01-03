@@ -7,7 +7,7 @@ Class {
 	#instVars : [
 		'filter'
 	],
-	#category : #'SequenceDiagrams-Tally'
+	#category : #'SequenceDiagrams-ObjectDiagram'
 }
 
 { #category : #'as yet unclassified' }
@@ -15,7 +15,7 @@ SeqObjectAnalysis >> analyzeAccessCollection: coll [
 	"return a dictionary of those objects in the collection, with a dummy key to make it compatible with non collections"
 
 	| objModel refs |
-	objModel := SeqObjectDiagramModel new obj: coll.
+	objModel := SeqObjectDiagramModelEntity new obj: coll.
 	coll isString
 		ifTrue: [ ^ objModel ].
 	refs := coll
@@ -31,7 +31,7 @@ SeqObjectAnalysis >> analyzeAccessCollection: coll [
 { #category : #'as yet unclassified' }
 SeqObjectAnalysis >> analyzeAccessObj: obj [
 	| objModel accessors refs |
-	objModel := SeqObjectDiagramModel new obj: obj.
+	objModel := SeqObjectDiagramModelEntity new obj: obj.
 	accessors := obj class
 		in: [ :c | c allSelectors & c allInstVarNames ].
 	refs := accessors
@@ -111,7 +111,7 @@ SeqObjectAnalysis >> includeSubclassesOf: aClass [
 
 { #category : #initialization }
 SeqObjectAnalysis >> initialize [
-	filter := SeqClassFilter new
+	filter := ObjDiaFilter new
 ]
 
 { #category : #'as yet unclassified' }
@@ -158,6 +158,28 @@ SeqObjectAnalysis >> old_analyzeAccessObj: obj filter: aFilter [
 							dict at: elem class name put: elem.
 							dict ]) ].
 	^ objModel
+]
+
+{ #category : #'as yet unclassified' }
+SeqObjectAnalysis >> old_analyzeRoot: root [
+	| unVisited visited rootCat safetyCount |
+	unVisited := Set new.
+	unVisited add: root.
+	rootCat := root class category copyUpTo: $-.
+	filter includeCategory: rootCat.
+	visited := Dictionary new.
+	safetyCount := 50000.
+	[ unVisited notEmpty ]
+		whileTrue: [ | obj model |
+			(safetyCount := safetyCount - 1) < 0
+				ifTrue: [ ^ nil ].
+			obj := unVisited anyOne.
+			unVisited remove: obj.
+			(visited includesKey: obj)
+				ifFalse: [ model := self analyzeObj: obj.
+					visited at: obj put: model.
+					unVisited addAll: model refs values ] ].
+	^ self reduceRefs: visited
 ]
 
 { #category : #'as yet unclassified' }
