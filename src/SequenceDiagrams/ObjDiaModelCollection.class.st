@@ -7,8 +7,8 @@ Class {
 { #category : #analysis }
 ObjDiaModelCollection >> analyzeAccess [
 	"analyze the elements in my objects collection. Special case - do not analyze inside strings!"
-
-	obj isString
+	
+	obj isString | obj isText
 		ifTrue: [ ^ self ].
 	obj
 		do: [ :elem |  self analyzeElement: elem]
@@ -16,17 +16,29 @@ ObjDiaModelCollection >> analyzeAccess [
 
 { #category : #'as yet unclassified' }
 ObjDiaModelCollection >> analyzeElement: elem [
-self halt.
 	( model buildFilter check: elem)
 		ifTrue: [ self destinationsAt: 'Index' put: elem ].
 	
 ]
 
+{ #category : #testing }
+ObjDiaModelCollection >> isCollection [ 
+	^true
+]
+
+{ #category : #removing }
+ObjDiaModelCollection >> removeFromModel [
+	sources copy do: [ :ref | ref removeFromModel ].
+	destinations copy do: [ :ref | ref removeFromModel ].
+	model entities removeKey: self obj
+]
+
 { #category : #writing }
 ObjDiaModelCollection >> writeRefsOn: out [
-	destinations do: [ :ref| 
-		out << self printNameNoSpace << ' --> '
-						<< ref destination printNameNoSpace << String cr ]
+	destinations
+		do: [ :ref | 
+			out << self printNameNoSpace << ' --> '
+				<< ref destination printNameNoSpace << String cr ] 
 ]
 
 { #category : #writing }

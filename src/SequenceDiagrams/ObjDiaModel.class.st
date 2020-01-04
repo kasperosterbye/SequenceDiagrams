@@ -20,26 +20,25 @@ Class {
 
 { #category : #'as yet unclassified' }
 ObjDiaModel >> analyzeRoot: root [
-	| unVisited rootCat safetyCount |
+	| unVisited visited rootCat safetyCount |
 	unVisited := Set new.
 	unVisited add: root.
+	visited := Set new.
 	rootCat := root class category copyUpTo: $-.
 	buildFilter includeCategory: rootCat.
-	entities := Dictionary new.
 	safetyCount := 10000.	"to prevent too large an investigation"
 	[ unVisited notEmpty ]
 		whileTrue: [ | obj entity |
-			
-					self halt.
 			(safetyCount := safetyCount - 1) < 0
 				ifTrue: [ ^ nil ].
 			obj := unVisited anyOne.
 			unVisited remove: obj.
-			(entities includesKey: obj)
-				ifFalse: [ entity := ObjDiaModelEntity on: obj in: self. 
+			(visited includes: obj)
+				ifFalse: [ entity := self entityFor: obj. 
 					entities at: obj put: entity.
 					entity analyzeAccess.
-					unVisited addAll: entity destinationObjects ] ]
+					visited add: obj.
+					unVisited addAll: (entity destinationObjects copyWithoutAll: visited)] ]
 ]
 
 { #category : #accessing }
@@ -73,6 +72,12 @@ ObjDiaModel >> entityFor: obj [
 	^newEntity
 ]
 
+{ #category : #initialization }
+ObjDiaModel >> initialize [
+	entities := Dictionary new.
+	refs := OrderedCollection new.
+]
+
 { #category : #'as yet unclassified' }
 ObjDiaModel >> objDiagramFor: root [
 	^ PlantUMLBridge loadUML: (self objUMLFor: root)
@@ -83,7 +88,8 @@ ObjDiaModel >> objUMLFor: root [
 	| out |
 	self analyzeRoot: root.
 	entities ifNil: [ self error: 'model too large' ].
-	"self preparePresentation."
+	self reduceModel.
+	self validateModel .
 	out := String new writeStream.
 	self writeHeaderFor: root on: out.
 	self writeObjectsOn: out.
@@ -102,6 +108,19 @@ ObjDiaModel >> presentationFilter: anObject [
 	presentationFilter := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+ObjDiaModel >> pruneEmptyCollections [
+	| emptyCollections |
+	emptyCollections := entities values
+		select: [ :ent | ent isCollection and: [ ent destinations isEmpty ] ].
+	emptyCollections do: [ :entity | entity removeFromModel ] 
+]
+
+{ #category : #'as yet unclassified' }
+ObjDiaModel >> reduceModel [
+	self pruneEmptyCollections 
+]
+
 { #category : #accessing }
 ObjDiaModel >> refs [
 	^ refs
@@ -110,6 +129,22 @@ ObjDiaModel >> refs [
 { #category : #accessing }
 ObjDiaModel >> refs: anObject [
 	refs := anObject
+]
+
+{ #category : #'as yet unclassified' }
+ObjDiaModel >> validateModel [
+	entities do: [ :entity |
+		entity sources do: [ :ref | 
+			(entities at: ref source key obj) = ref source key ifFalse: [ self error ].
+			ref destination = entity ifFalse: [ self error ].
+			(ref source key destinations includes: ref) ifFalse: [ self error ] ].
+		entity destinations do: [ :ref  |
+			(entities at: ref destination obj) = ref destination ifFalse: [ self error ].
+			ref source key = entity ifFalse: [ self error].
+			(ref destination sources includes: ref) ifFalse: [ self error ] ] ].
+	refs do: [ :ref |
+		(ref source key destinations includes: ref) ifFalse: [ self error ].
+		(ref destination sources includes: ref) ifFalse: [ self error ] ].
 ]
 
 { #category : #'as yet unclassified' }

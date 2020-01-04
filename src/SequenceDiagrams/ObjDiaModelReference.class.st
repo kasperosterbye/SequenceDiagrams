@@ -47,6 +47,22 @@ ObjDiaModelReference >> model: anObject [
 	model := anObject
 ]
 
+{ #category : #printing }
+ObjDiaModelReference >> printOn: stream [ 
+	stream << 'ModelRef:( '.
+	source key printOn: stream.
+	stream << ' -> '.
+	destination printOn: stream.
+	stream << ') '
+]
+
+{ #category : #removing }
+ObjDiaModelReference >> removeFromModel [
+	source key destinations remove: self.
+	destination sources remove: self.
+	model refs remove: self
+]
+
 { #category : #accessing }
 ObjDiaModelReference >> source [
 	^ source

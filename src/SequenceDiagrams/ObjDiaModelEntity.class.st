@@ -47,7 +47,9 @@ ObjDiaModelEntity >> destinationsAt: accessor put: value [
 	destination := model entityFor: value.
 	ref := ObjDiaModelReference new
 		source: self -> accessor;
-		destination: destination.
+		destination: destination;
+		model: model.
+	model refs add: ref.
 	destinations add: ref. 
 	destination sources add: ref
 ]
@@ -57,6 +59,11 @@ ObjDiaModelEntity >> initialize [
 	sources := OrderedCollection new.
 	destinations  := OrderedCollection  new.
 	
+]
+
+{ #category : #testing }
+ObjDiaModelEntity >> isCollection [
+	^ false
 ]
 
 { #category : #accessing }
@@ -86,7 +93,14 @@ ObjDiaModelEntity >> printName [
 
 { #category : #writing }
 ObjDiaModelEntity >> printNameNoSpace [
-	^ 'obj', obj hash printString
+	^ obj class name, obj hash printString
+]
+
+{ #category : #printing }
+ObjDiaModelEntity >> printOn: stream [
+	stream << 'Model of:( '.
+	obj printOn: stream.
+	stream << ') '
 ]
 
 { #category : #accessing }
