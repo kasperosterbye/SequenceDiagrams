@@ -5,7 +5,9 @@ Class {
 		'sources',
 		'destinations',
 		'obj',
-		'model'
+		'model',
+		'entityId',
+		'pseudoObject'
 	],
 	#category : #'SequenceDiagrams-ObjectDiagram'
 }
@@ -43,6 +45,7 @@ ObjDiaModelEntity >> destinations: anObject [
 
 { #category : #accessing }
 ObjDiaModelEntity >> destinationsAt: accessor put: value [
+	"add an outgoing ref from me to the entity for value"
 	| destination ref |
 	destination := model entityFor: value.
 	ref := ObjDiaModelReference new
@@ -50,8 +53,21 @@ ObjDiaModelEntity >> destinationsAt: accessor put: value [
 		destination: destination;
 		model: model.
 	model refs add: ref.
-	destinations add: ref. 
-	destination sources add: ref
+]
+
+{ #category : #accessing }
+ObjDiaModelEntity >> entityId [
+	entityId ifNil:[ entityId := model nextEntityNumber].
+	^ entityId 
+]
+
+{ #category : #'as yet unclassified' }
+ObjDiaModelEntity >> includeInPseudo: pseudo [
+	pseudoObject ifNotNil: [ ^ self ].
+	(model presentationFilter check: self)
+		ifFalse: [ pseudoObject := pseudo.
+			pseudoObject unvisitedSources addAll: sources.
+			pseudoObject unvisitedDestinations addAll: destinations ] 
 ]
 
 { #category : #initialization }
@@ -86,6 +102,18 @@ ObjDiaModelEntity >> obj: anObject [
 	obj := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+ObjDiaModelEntity >> preparePresentation [
+	(model presentationFilter check: self) ifTrue:[ ^self].
+	
+	pseudoObject ifNotNil: [ ^ self ].
+	
+	pseudoObject := ObjDiaModelPseudoObject new.
+	pseudoObject unvisitedSources addAll: sources.
+	pseudoObject unvisitedDestinations addAll: destinations.
+	pseudoObject preparePresentation 
+]
+
 { #category : #writing }
 ObjDiaModelEntity >> printName [
 	^ obj class name
@@ -93,7 +121,7 @@ ObjDiaModelEntity >> printName [
 
 { #category : #writing }
 ObjDiaModelEntity >> printNameNoSpace [
-	^ obj class name, obj hash printString
+	^ obj class name, self entityId 
 ]
 
 { #category : #printing }
@@ -101,6 +129,16 @@ ObjDiaModelEntity >> printOn: stream [
 	stream << 'Model of:( '.
 	obj printOn: stream.
 	stream << ') '
+]
+
+{ #category : #accessing }
+ObjDiaModelEntity >> pseudoObject [
+	^ pseudoObject
+]
+
+{ #category : #accessing }
+ObjDiaModelEntity >> pseudoObject: anObject [
+	pseudoObject := anObject
 ]
 
 { #category : #accessing }

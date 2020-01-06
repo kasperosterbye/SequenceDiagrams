@@ -12,7 +12,7 @@ Class {
 
 { #category : #'as yet unclassified' }
 ObjDiaModelReference >> arrowType [
-	kind = #singletonCollection 
+	kind = #singleton 
 		ifTrue: [ ^ ' ..> ' ].
 	^ ' --> '
 ]
@@ -23,8 +23,38 @@ ObjDiaModelReference >> destination [
 ]
 
 { #category : #accessing }
-ObjDiaModelReference >> destination: anObject [
-	destination := anObject
+ObjDiaModelReference >> destination: anEntity [
+	destination ifNotNil:[ destination sources remove: self].
+	destination := anEntity.
+	destination sources add: self.
+]
+
+{ #category : #'as yet unclassified' }
+ObjDiaModelReference >> includeDestinationInPseudo: pseudo [
+	| destinationEntity |
+	destinationEntity := self destination.
+	destinationEntity pseudoObject ifNotNil: [ ^ self ].
+	(model presentationFilter check: destinationEntity)
+		ifTrue: [ self source: pseudo -> 'Index' ]
+		ifFalse: [ destinationEntity pseudoObject: pseudo.
+			destinationEntity unvisitedSources addAll: destinationEntity sources.
+			destinationEntity unvisitedDestinations
+				addAll: destinationEntity destinations ]
+]
+
+{ #category : #'as yet unclassified' }
+ObjDiaModelReference >> includeSourceInPseudo: pseudo [
+	| sourceEntity |
+	sourceEntity := self sourceNode.
+	sourceEntity pseudoObject ifNotNil: [ ^ self ].
+	(model presentationFilter check: sourceEntity )
+		ifTrue:[ 
+			self destination: pseudo. ]
+		ifFalse: [ 
+			sourceEntity pseudoObject: pseudo.
+			sourceEntity unvisitedSources addAll: sourceEntity sources.
+			sourceEntity unvisitedDestinations addAll: sourceEntity destinations ] 
+	
 ]
 
 { #category : #accessing }
@@ -69,8 +99,10 @@ ObjDiaModelReference >> source [
 ]
 
 { #category : #accessing }
-ObjDiaModelReference >> source: anObject [
-	source := anObject
+ObjDiaModelReference >> source: assocEntitySelector [
+	source ifNotNil: [ source destinations remove: self ].
+	source := assocEntitySelector .
+	source key destinations add: self .
 ]
 
 { #category : #'as yet unclassified' }

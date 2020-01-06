@@ -21,9 +21,28 @@ ObjDiaModelCollection >> analyzeElement: elem [
 	
 ]
 
+{ #category : #accessing }
+ObjDiaModelCollection >> categoryName [
+	^ sources first source key obj class category 
+]
+
 { #category : #testing }
 ObjDiaModelCollection >> isCollection [ 
 	^true
+]
+
+{ #category : #removing }
+ObjDiaModelCollection >> reduceToSingletonRefs [
+	"I have but a single element in my collection. Change my source references to point to that element"
+	| singletonDest singletonRef|
+	singletonRef := destinations first.
+	singletonDest := singletonRef destination.
+	sources do: [ :ref | 
+		ref destination: singletonDest; kind: #singleton.
+		singletonDest sources add: ref ].
+	singletonDest sources remove: singletonRef .
+	model entities removeKey: self obj.
+	model refs remove: singletonRef
 ]
 
 { #category : #removing }
@@ -37,13 +56,13 @@ ObjDiaModelCollection >> removeFromModel [
 ObjDiaModelCollection >> writeRefsOn: out [
 	destinations
 		do: [ :ref | 
-			out << self printNameNoSpace << ' --> '
+			out << self printNameNoSpace << ref arrowType 
 				<< ref destination printNameNoSpace << String cr ] 
 ]
 
-{ #category : #writing }
-ObjDiaModelCollection >> writeUmlObjectOn: out [
-	(out << 'object "' << self printName << '" as ')
-		<< self printNameNoSpace;
-		cr
+{ #category : #accessing }
+ObjDiaModelCollection >> writeUmlOn: out [
+	out << 'package ' << self categoryName << ' {' ;cr.
+		super writeUmlOn: out.
+		out << '}'; cr
 ]

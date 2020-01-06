@@ -13,7 +13,8 @@ Class {
 		'buildFilter',
 		'presentationFilter',
 		'entities',
-		'refs'
+		'refs',
+		'entityCounter'
 	],
 	#category : #'SequenceDiagrams-ObjectDiagram'
 }
@@ -48,7 +49,6 @@ ObjDiaModel >> buildFilter [
 
 { #category : #accessing }
 ObjDiaModel >> buildFilter: initializationBlock [
-	buildFilter := ObjDiaFilter new.
 	initializationBlock value: buildFilter 
 ]
 
@@ -76,6 +76,14 @@ ObjDiaModel >> entityFor: obj [
 ObjDiaModel >> initialize [
 	entities := Dictionary new.
 	refs := OrderedCollection new.
+	buildFilter := ObjDiaFilter new.
+	entityCounter := 0.
+]
+
+{ #category : #'as yet unclassified' }
+ObjDiaModel >> nextEntityNumber [
+	entityCounter := entityCounter +1.
+	^ entityCounter printString
 ]
 
 { #category : #'as yet unclassified' }
@@ -98,6 +106,16 @@ ObjDiaModel >> objUMLFor: root [
 	^ out contents
 ]
 
+{ #category : #'as yet unclassified' }
+ObjDiaModel >> openDiagramFor: root [
+	^ PlantUMLBridge openUML: (self objUMLFor: root) 
+]
+
+{ #category : #'as yet unclassified' }
+ObjDiaModel >> preparePresentation [ 
+	entities values do: [ :entity | entity preparePresentation ]
+]
+
 { #category : #accessing }
 ObjDiaModel >> presentationFilter [
 	^ presentationFilter
@@ -118,7 +136,9 @@ ObjDiaModel >> pruneEmptyCollections [
 
 { #category : #'as yet unclassified' }
 ObjDiaModel >> reduceModel [
-	self pruneEmptyCollections 
+	self pruneEmptyCollections.
+	self simplifySingletonCollections.
+	self preparePresentation.
 ]
 
 { #category : #accessing }
@@ -129,6 +149,17 @@ ObjDiaModel >> refs [
 { #category : #accessing }
 ObjDiaModel >> refs: anObject [
 	refs := anObject
+]
+
+{ #category : #'as yet unclassified' }
+ObjDiaModel >> simplifySingletonCollections [
+	"a singleton collection is one with just one element.
+	simplyfy it into a reference of kind #singleton"
+	| singletonCollections |
+	singletonCollections := entities values 
+		select: [ :entity | entity isCollection and: [ entity obj size = 1 ]. ].
+	singletonCollections do: [ :collEntity | collEntity reduceToSingletonRefs ]
+
 ]
 
 { #category : #'as yet unclassified' }
